@@ -6,6 +6,7 @@ import xlwt
 import xlrd
 import io
 import math
+import os
 
 screen_width = 750
 
@@ -18,7 +19,7 @@ item_xls = readItemStream()
 item_table = item_xls.sheets()[0]
 global item_num
 global item
-item_num = item_table.nrows - 1  # 读入商品数
+item_num = item_table.nrows - 1  # 读入商品
 item = []
 
 item_index = 0
@@ -65,13 +66,13 @@ print(img_data.size[0])
 
 
 def calcColor(color_input,color_base):
-    # 背景色过滤参考值
+    # 背景色过滤参考
     r = (color_input[0] - color_base[0])**2 + (color_input[1] - color_base[1])**2 + (color_input[2] - color_base[2])**2
     return int(r)
 
 def getImageBox(img_input):
     img_array = img_input.load()
-    color_base = img_array[0,0] # 基本背景色取值
+    color_base = img_array[0,0] # 基本背景色取��?
     img_width = img_input.size[0]
     img_height = img_input.size[1]
 
@@ -82,7 +83,7 @@ def getImageBox(img_input):
         x1 = i
         for j in range(0,img_height):
             # str(img_array[i,j]) + str(calcColor(img_array[i,j])))
-            sum = sum + calcColor(img_array[i,j],color_base)
+            sum = sum + int(calcColor(img_array[i,j],color_base))
         # print('line: ' + str(i) + ' ' + str(sum/img_height))
         if (sum/img_height) > 2:
             break;
@@ -157,17 +158,17 @@ def createLayout(layout_num):
     return r
 
 def createImageList(layout_input):
-    r = []
+    s = []
     print('\ncreateImageList ...')
     for i in range(0,len(layout_input)):
-        r.append([]) # 创建一行图像，并定位到 r[i]
+        s.append([]) # 创建一行图像，并定位到 r[i]
         print()
         print(layout_input[i])
         for j in range(0,len(layout_input[i])):
-            r[i].append(getImageData(layout_input[i][j])) # 原始图片载入
-            r[i][j] = r[i][j].crop(getImageBox(r[i][j])) # 切掉白边
+            s[i].append(getImageData(layout_input[i][j])) # 原始图片载入
+            s[i][j] = s[i][j].crop(getImageBox(s[i][j])) # 切掉白边
     print('- Image list done.')
-    return r
+    return s
 
 def getGoldBox(img_input):
     w = img_input.size[0]
@@ -242,6 +243,9 @@ print(layout)
 #create_layout
 img_layout = drawLayout(gold_list)
 img_layout.show()
+if os.path.exists('st') == False:
+    os.mkdir('st')
+img_layout.save('./save/' + str(random.randint(10000,99999))+'.jpg','jpeg')
 
 
 
